@@ -5,6 +5,7 @@ import { Division } from '../SyntaxAnalyzer/Tree/Division';
 import { NumberConstant } from '../SyntaxAnalyzer/Tree/NumberConstant';
 import { NumberVariable } from './Variables/NumberVariable';
 import { TreeNodeBase } from '../SyntaxAnalyzer/Tree/TreeNodeBase';
+import { UnaryMinus } from '../SyntaxAnalyzer/Tree/UnaryMinus';
 
 export class Engine {
     /**
@@ -54,8 +55,13 @@ export class Engine {
             }
 
             return new NumberVariable(result as number);
-
-        } else {
+ 
+        } else if (expression instanceof UnaryMinus) {
+            //рекурсивное разрешение унарного минуса
+            const operand = this.evaluateSimpleExpression(expression.operand);
+            return new NumberVariable(-operand.value);
+        }
+        else {
             return this.evaluateTerm(expression);
         }
     }
@@ -80,6 +86,11 @@ export class Engine {
     }
 
     evaluateMultiplier(expression: TreeNodeBase) {
+        //расчитываем выражение с унарным минусом рекурсивно на случай нескольких унарных минусов, например
+        if (expression instanceof UnaryMinus) {
+            const operand = this.evaluateMultiplier(expression.operand);
+            return new NumberVariable(-operand.value);
+        }
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
         } else {

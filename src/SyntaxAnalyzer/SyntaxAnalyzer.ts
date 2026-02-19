@@ -8,6 +8,7 @@ import { LexicalAnalyzer } from '../LexicalAnalyzer/LexicalAnalyzer';
 import { TreeNodeBase } from './Tree/TreeNodeBase';
 import { SymbolBase } from '../LexicalAnalyzer/Symbols/SymbolBase';
 import { BinaryOperation } from './Tree/BinaryOperation';
+import { UnaryMinus } from './Tree/UnaryMinus';
 
 /**
  * Синтаксический анализатор - отвечает за построение синтаксического дерева
@@ -128,7 +129,14 @@ export class SyntaxAnalyzer {
     /**
      *  Разбор "множителя"
      */
-    scanMultiplier(): NumberConstant {
+    scanMultiplier() {
+        //разбор отрицательного "множителя"
+        if (this.symbol.symbolCode === SymbolsCodes.minus) {
+            const minusSymbol = this.symbol;  
+            this.nextSym();                  
+            const operand = this.scanMultiplier(); 
+            return new UnaryMinus(minusSymbol, operand);
+        }   
         let integerConstant: SymbolBase | null = this.symbol;
 
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
