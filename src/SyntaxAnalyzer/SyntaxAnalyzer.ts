@@ -132,11 +132,18 @@ export class SyntaxAnalyzer {
     scanMultiplier() {
         //разбор отрицательного "множителя"
         if (this.symbol.symbolCode === SymbolsCodes.minus) {
-            const minusSymbol = this.symbol;  
-            this.nextSym();                  
-            const operand = this.scanMultiplier(); 
+            const minusSymbol = this.symbol;
+            this.nextSym();
+            const operand = this.scanMultiplier();
             return new UnaryMinus(minusSymbol, operand);
-        }   
+        }
+        //разбор с открывающей скобки
+        if (this.symbol.symbolCode === SymbolsCodes.leftBracket) {
+            this.nextSym();
+            const expression = this.scanExpression();
+            this.accept(SymbolsCodes.rightBracket);
+            return expression;
+        }
         let integerConstant: SymbolBase | null = this.symbol;
 
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще

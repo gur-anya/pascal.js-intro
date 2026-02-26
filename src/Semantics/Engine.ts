@@ -56,12 +56,7 @@ export class Engine {
 
             return new NumberVariable(result as number);
  
-        } else if (expression instanceof UnaryMinus) {
-            //рекурсивное разрешение унарного минуса
-            const operand = this.evaluateSimpleExpression(expression.operand);
-            return new NumberVariable(-operand.value);
-        }
-        else {
+        } else {
             return this.evaluateTerm(expression);
         }
     }
@@ -94,7 +89,7 @@ export class Engine {
         if (expression instanceof NumberConstant) {
             return new NumberVariable(expression.symbol.value);
         } else {
-            throw 'Number Constant expected.';
+            return this.evaluateSimpleExpression(expression);
         }
     }
 };
