@@ -1,3 +1,4 @@
+import { PassThrough } from 'stream';
 import { FileIO } from '../IO/FileIO';
 import { IntegerConstant } from '../LexicalAnalyzer/Symbols/IntegerConstant';
 import { Symbol } from '../LexicalAnalyzer/Symbols/Symbol';
@@ -64,7 +65,7 @@ export class LexicalAnalyzer {
         if (numberSymbolsRegExp.exec(this.char) !== null) {    
             this.scanWord(numberSymbolsRegExp);
 
-            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord);
+            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord, this.fileIO.line, this.fileIO.column);
 
         } else if (variableSymbolsRegExp.exec(this.char) !== null) {
             this.scanWord(variableSymbolsRegExp);
@@ -99,12 +100,16 @@ export class LexicalAnalyzer {
                 case ')':
                     this.char = this.fileIO.nextCh();
                     return this.getSymbol(SymbolsCodes.rightBracket);
+
+                case '=':
+                    this.char = this.fileIO.nextCh();
+                    return this.getSymbol(SymbolsCodes.assigner);
             }
         }
         throw `Inadmissible symbol:${this.char}.`;
     }
 
     getSymbol(symbolCode) {
-        return new Symbol(symbolCode, this.currentWord);
+        return new Symbol(symbolCode, this.currentWord, this.fileIO.line, this.fileIO.column);
     }
 }

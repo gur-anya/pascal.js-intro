@@ -9,6 +9,9 @@ import { TreeNodeBase } from './Tree/TreeNodeBase';
 import { SymbolBase } from '../LexicalAnalyzer/Symbols/SymbolBase';
 import { BinaryOperation } from './Tree/BinaryOperation';
 import { UnaryMinus } from './Tree/UnaryMinus';
+import { Variable } from './Tree/Variable';
+import { Assignment } from './Tree/Assigment';
+
 
 /**
  * Синтаксический анализатор - отвечает за построение синтаксического дерева
@@ -53,7 +56,7 @@ export class SyntaxAnalyzer {
         this.nextSym();
 
         while (this.symbol !== null) {
-            let expression: TreeNodeBase = this.scanExpression();
+            let expression: TreeNodeBase = this.scanStatement();
 
             this.trees.push(expression);
 
@@ -137,6 +140,13 @@ export class SyntaxAnalyzer {
             const operand = this.scanMultiplier();
             return new UnaryMinus(minusSymbol, operand);
         }
+        //разбор буквы-переменной
+        if (this.symbol.symbolCode === SymbolsCodes.identifier) {
+            const variable = this.symbol;
+            this.nextSym();
+            return new Variable(variable);
+        }
+
         //разбор с открывающей скобки
         if (this.symbol.symbolCode === SymbolsCodes.leftBracket) {
             this.nextSym();
@@ -149,5 +159,32 @@ export class SyntaxAnalyzer {
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
 
         return new NumberConstant(integerConstant);
+    }
+
+    //разбор выражения (которое может включать в себя присваивание переменной)
+    scanStatement(): TreeNodeBase {
+
+        if (this.symbol !== null) {
+
+            const currentCode = this.symbol.symbolCode;
+            //присваивание
+            if (currentCode === SymbolsCodes.identifier) {
+
+                const identifier = this.symbol;
+                this.nextSym();
+
+                //если после переменной стоит знак присваивания
+                if (this.symbol !== null && this.symbol.symbolCode === SymbolsCodes.assigner) {
+                    const assignSymbol = this.symbol;
+                    this.nextSym();
+                    const expression = this.scanExpression();
+                    return new Assignment(assignSymbol, new Variable(identifier), expression);
+                }
+
+                //не присваивание
+                return new Variable(identifier);
+            }
+        }
+        return this.scanExpression();
     }
 };
