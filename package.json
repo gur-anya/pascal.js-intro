@@ -15,6 +15,7 @@
         "test_start": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/base",
         "test_unminis": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/task1_unminus",
         "test_brackets": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/task2_brackets",
-        "test_variables": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/task3_variables"
+        "test_variables": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/task3_variables",
+        "test_assigment_chain": "node --experimental-vm-modules node_modules/.bin/jest tests/__tests__/task4_assigment_chain"
     }
 }

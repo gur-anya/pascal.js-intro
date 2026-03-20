@@ -56,7 +56,7 @@ export class SyntaxAnalyzer {
         this.nextSym();
 
         while (this.symbol !== null) {
-            let expression: TreeNodeBase = this.scanStatement();
+            let expression: TreeNodeBase = this.scanExpression();
 
             this.trees.push(expression);
 
@@ -75,7 +75,16 @@ export class SyntaxAnalyzer {
     scanExpression(): TreeNodeBase {
         let term: TreeNodeBase = this.scanTerm();
         let operationSymbol: SymbolBase | null = null;
+        //разбор присваивания
+        if (term instanceof Variable && this.symbol !== null && this.symbol.symbolCode === SymbolsCodes.assigner) {
 
+            const assignSymbol = this.symbol;
+            this.nextSym();
+
+            const right = this.scanExpression();
+
+            return new Assignment(assignSymbol, term, right);
+        }
         while (this.symbol !== null && (
             this.symbol.symbolCode === SymbolsCodes.plus ||
             this.symbol.symbolCode === SymbolsCodes.minus
@@ -159,32 +168,5 @@ export class SyntaxAnalyzer {
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще
 
         return new NumberConstant(integerConstant);
-    }
-
-    //разбор выражения (которое может включать в себя присваивание переменной)
-    scanStatement(): TreeNodeBase {
-
-        if (this.symbol !== null) {
-
-            const currentCode = this.symbol.symbolCode;
-            //присваивание
-            if (currentCode === SymbolsCodes.identifier) {
-
-                const identifier = this.symbol;
-                this.nextSym();
-
-                //если после переменной стоит знак присваивания
-                if (this.symbol !== null && this.symbol.symbolCode === SymbolsCodes.assigner) {
-                    const assignSymbol = this.symbol;
-                    this.nextSym();
-                    const expression = this.scanExpression();
-                    return new Assignment(assignSymbol, new Variable(identifier), expression);
-                }
-
-                //не присваивание
-                return new Variable(identifier);
-            }
-        }
-        return this.scanExpression();
     }
 };
