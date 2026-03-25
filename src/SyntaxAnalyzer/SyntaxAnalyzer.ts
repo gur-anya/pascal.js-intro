@@ -133,6 +133,7 @@ export class SyntaxAnalyzer {
      *  Разбор "множителя"
      */
     scanMultiplier() {
+        if (this.symbol !== null){
         //разбор отрицательного "множителя"
         if (this.symbol.symbolCode === SymbolsCodes.minus) {
             const minusSymbol = this.symbol;
@@ -154,6 +155,7 @@ export class SyntaxAnalyzer {
             this.accept(SymbolsCodes.rightBracket);
             return expression;
         }
+    }
         let integerConstant: SymbolBase | null = this.symbol;
 
         this.accept(SymbolsCodes.integerConst); // проверим, что текущий символ это именно константа, а не что-то еще

@@ -11,7 +11,7 @@ export class FileIO {
         this.charPointer = 0;
         this.text = fs.readFileSync(fileName, 'utf-8');
         this.line = 1;
-        this.column = 1;
+        this.column = 0;
     }
 
     nextCh() {

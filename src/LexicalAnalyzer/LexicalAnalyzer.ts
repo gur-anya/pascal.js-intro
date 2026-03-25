@@ -61,11 +61,13 @@ export class LexicalAnalyzer {
         this.currentWord = '';
         const numberSymbolsRegExp = /\d/;  
         const variableSymbolsRegExp = /\w/i;
+        const line = this.fileIO.line;
+        const column = this.fileIO.column;
 
         if (numberSymbolsRegExp.exec(this.char) !== null) {    
             this.scanWord(numberSymbolsRegExp);
 
-            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord, this.fileIO.line, this.fileIO.column);
+            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord, line, column);
 
         } else if (variableSymbolsRegExp.exec(this.char) !== null) {
             this.scanWord(variableSymbolsRegExp);
