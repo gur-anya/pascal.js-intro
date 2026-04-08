@@ -61,55 +61,57 @@ export class LexicalAnalyzer {
         this.currentWord = '';
         const numberSymbolsRegExp = /\d/;  
         const variableSymbolsRegExp = /\w/i;
+        const line = this.fileIO.line;
+        const column = this.fileIO.column;
 
         if (numberSymbolsRegExp.exec(this.char) !== null) {    
             this.scanWord(numberSymbolsRegExp);
 
-            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord, this.fileIO.line, this.fileIO.column);
+            return new IntegerConstant(SymbolsCodes.integerConst, this.currentWord, line, column);
 
         } else if (variableSymbolsRegExp.exec(this.char) !== null) {
             this.scanWord(variableSymbolsRegExp);
 
-            return this.getSymbol(SymbolsCodes.identifier);
+            return this.getSymbol(SymbolsCodes.identifier, line, column);
 
         } else if (/\n/.exec(this.char) !== null) {
             this.char = this.fileIO.nextCh();
-            return this.getSymbol(SymbolsCodes.endOfLine);
+            return this.getSymbol(SymbolsCodes.endOfLine, line, column);
         } else {
 
             switch (this.char) {
                 case '-':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.minus);
+                    return this.getSymbol(SymbolsCodes.minus, line, column);
 
                 case '+':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.plus);
+                    return this.getSymbol(SymbolsCodes.plus, line, column);
 
                 case '*':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.star);
+                    return this.getSymbol(SymbolsCodes.star, line, column);
 
                 case '/':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.slash);
+                    return this.getSymbol(SymbolsCodes.slash, line, column);
                 case '(':
                 this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.leftBracket);
+                    return this.getSymbol(SymbolsCodes.leftBracket, line, column);
 
                 case ')':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.rightBracket);
+                    return this.getSymbol(SymbolsCodes.rightBracket, line, column);
 
                 case '=':
                     this.char = this.fileIO.nextCh();
-                    return this.getSymbol(SymbolsCodes.assigner);
+                    return this.getSymbol(SymbolsCodes.assigner, line, column);
             }
         }
         throw `Inadmissible symbol:${this.char}.`;
     }
 
-    getSymbol(symbolCode) {
-        return new Symbol(symbolCode, this.currentWord, this.fileIO.line, this.fileIO.column);
+    getSymbol(symbolCode, line, column) {
+        return new Symbol(symbolCode, this.currentWord, line, column);
     }
 }
